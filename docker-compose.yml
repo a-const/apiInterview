@@ -1,0 +1,27 @@
+version: '2.17.2'
+services:
+  mongodb:
+    image: mongo:4.1.8-xenial
+    hostname: mongodb
+    container_name: db
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    
+
+  api:
+    build: ./
+    restart: unless-stopped
+    image: "api:latest"
+    container_name: api
+    command: sh -c "/wait && /api/cmd/main"
+    environment:
+      - MONGO_HOSTNAME=db
+      - MONGO_DB_HOST=mongodb
+      - MONGO_DB_PORT=27017
+      - WAIT_HOSTS=mongodb:27017
+      - WAIT_HOSTS_TIMEOUT=300
+      - WAIT_SLEEP_INTERVAL=10
+      - WAIT_HOST_CONNECT_TIMEOUT=10
+    ports:
+      - "8080:8080"
